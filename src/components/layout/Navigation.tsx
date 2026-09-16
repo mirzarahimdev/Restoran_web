@@ -1,12 +1,12 @@
 import { NavLink } from 'react-router-dom'
+import { useLanguage } from '../../i18n/LanguageContext'
 
 const navItems = [
-  { to: '/', label: 'Bosh sahifa', end: true },
-  { to: '/restoranlar', label: 'Restoranlar' },
-  { to: '/kategoriyalar', label: 'Kategoriyalar' },
-  { to: '/aksiyalar', label: 'Aksiyalar' },
-  { to: '/buyurtmalarim', label: 'Buyurtmalarim' },
-]
+  { to: '/', key: 'nav.home', end: true },
+  { to: '/restoranlar', key: 'nav.restaurants' },
+  { to: '/aksiyalar', key: 'nav.promotions' },
+  { to: '/profil#tarix', key: 'nav.orders' },
+] as const
 
 type NavigationProps = {
   className?: string
@@ -15,13 +15,15 @@ type NavigationProps = {
 }
 
 export function Navigation({ className = '', onNavigate, stacked }: NavigationProps) {
+  const { t } = useLanguage()
+
   return (
     <nav className={className}>
       {navItems.map((item) => (
         <NavLink
           key={item.to}
           to={item.to}
-          end={item.end}
+          end={'end' in item ? item.end : undefined}
           onClick={onNavigate}
           className={({ isActive }) =>
             stacked
@@ -35,7 +37,7 @@ export function Navigation({ className = '', onNavigate, stacked }: NavigationPr
                 }`
           }
         >
-          {item.label}
+          {t(item.key)}
         </NavLink>
       ))}
     </nav>

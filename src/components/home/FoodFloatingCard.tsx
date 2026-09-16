@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useCart } from '../../cart/CartContext'
 import { Icon } from '../ui/Icon'
 
 type FoodFloatingCardProps = {
@@ -14,6 +15,8 @@ const images = {
 }
 
 export function FoodFloatingCard({ variant }: FoodFloatingCardProps) {
+  const { addItem } = useCart()
+
   if (variant === 'main') {
     return (
       <article className="group relative w-[300px] rounded-[24px] bg-white p-3 shadow-[0_20px_48px_rgba(20,27,43,0.14)] transition-transform hover:-translate-y-1">
@@ -55,6 +58,15 @@ export function FoodFloatingCard({ variant }: FoodFloatingCardProps) {
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
+                addItem({
+                  dishId: 'toy-oshi',
+                  restaurantId: 'samarqand-osh',
+                  restaurantName: 'Samarqand Osh',
+                  name: "To'y Oshi Samarqand",
+                  description: "Lagan, bedana tuxum, no'xat, mayiz",
+                  price: 48000,
+                  image: images.main,
+                })
               }}
               className="pointer-events-auto relative z-20 flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[#F97316] text-white shadow-[0_8px_18px_rgba(249,115,22,0.4)] transition-all hover:bg-[#EA580C] active:scale-90"
             >

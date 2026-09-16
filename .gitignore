@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Backend
+backend/.venv/
+backend/**/__pycache__/
+backend/*.db
+backend/.env
+backend/fooduz.db
+
 # Local visual comparison artifacts
 check-*.png
 compare-*.png

@@ -2,9 +2,18 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
+import { AuthProvider } from './auth/AuthContext'
+import { CartProvider } from './cart/CartContext'
+import { LanguageProvider } from './i18n/LanguageContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <LanguageProvider>
+      <AuthProvider>
+        <CartProvider>
+          <App />
+        </CartProvider>
+      </AuthProvider>
+    </LanguageProvider>
   </StrictMode>,
 )

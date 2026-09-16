@@ -1,0 +1,1 @@
+"""FoodUZ FastAPI backend."""
