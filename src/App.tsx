@@ -1,4 +1,28 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { AdminShell } from './admin/components/AdminShell'
+import { SuperAdminShell } from './admin/components/SuperAdminShell'
+import { AdminDashboardPage } from './admin/pages/AdminDashboardPage'
+import {
+  AdminCategoriesPage,
+  AdminCustomersPage,
+  AdminMenuPage,
+  AdminOrdersPage,
+  AdminPaymentsPage,
+  AdminProductsPage,
+  AdminProfilePage,
+  AdminPromosPage,
+  AdminReviewsPage,
+  AdminSettingsPage,
+  AdminStatsPage,
+  SuperAdminsPage,
+  SuperFinancePage,
+  SuperLogsPage,
+  SuperOrdersPage,
+  SuperReportsPage,
+  SuperRestaurantsPage,
+  SuperSettingsPage,
+} from './admin/pages/placeholders'
+import { SuperAdminDashboardPage } from './admin/pages/SuperAdminDashboardPage'
 import { MainLayout } from './components/layout/MainLayout'
 import { CheckoutPage } from './pages/CheckoutPage'
 import { FavoritesPage } from './pages/FavoritesPage'
@@ -19,6 +43,32 @@ export default function App() {
         <Route path="royxatdan-otish" element={<RegisterPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="parolni-tiklash" element={<ForgotPasswordPage />} />
+
+        <Route path="admin" element={<AdminShell />}>
+          <Route index element={<AdminDashboardPage />} />
+          <Route path="buyurtmalar" element={<AdminOrdersPage />} />
+          <Route path="profil" element={<AdminProfilePage />} />
+          <Route path="menyu" element={<AdminMenuPage />} />
+          <Route path="toifalar" element={<AdminCategoriesPage />} />
+          <Route path="mahsulotlar" element={<AdminProductsPage />} />
+          <Route path="aksiyalar" element={<AdminPromosPage />} />
+          <Route path="mijozlar" element={<AdminCustomersPage />} />
+          <Route path="sharhlar" element={<AdminReviewsPage />} />
+          <Route path="tolovlar" element={<AdminPaymentsPage />} />
+          <Route path="statistika" element={<AdminStatsPage />} />
+          <Route path="sozlamalar" element={<AdminSettingsPage />} />
+        </Route>
+
+        <Route path="super-admin" element={<SuperAdminShell />}>
+          <Route index element={<SuperAdminDashboardPage />} />
+          <Route path="restoranlar" element={<SuperRestaurantsPage />} />
+          <Route path="adminlar" element={<SuperAdminsPage />} />
+          <Route path="buyurtmalar" element={<SuperOrdersPage />} />
+          <Route path="moliya" element={<SuperFinancePage />} />
+          <Route path="hisobotlar" element={<SuperReportsPage />} />
+          <Route path="loglar" element={<SuperLogsPage />} />
+          <Route path="sozlamalar" element={<SuperSettingsPage />} />
+        </Route>
 
         <Route element={<MainLayout />}>
           <Route index element={<HomePage />} />

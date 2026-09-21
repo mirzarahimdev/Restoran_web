@@ -1,10 +1,19 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api'
 import { useAuth } from '../auth/AuthContext'
 import { formatCartSum, useCart } from '../cart/CartContext'
+import { YandexDeliveryMap } from '../components/maps/YandexDeliveryMap'
 import { Icon } from '../components/ui/Icon'
 import { useLanguage } from '../i18n/LanguageContext'
+import {
+  DEFAULT_TASHKENT,
+  getYandexMapsApiKey,
+  loadYandexMaps,
+  reverseGeocode,
+  type LatLon,
+  type YandexAddress,
+} from '../lib/yandexMaps'
 
 const stepDefs = [
   { n: 1, titleKey: 'checkout.step1', statusKey: 'checkout.step1.status', state: 'done' as const },
@@ -150,10 +159,18 @@ export function CheckoutPage() {
   const [orderMsg, setOrderMsg] = useState('')
   const [orderId, setOrderId] = useState<number | null>(null)
   const [locating, setLocating] = useState(false)
+  const [mapCoords, setMapCoords] = useState<LatLon>(DEFAULT_TASHKENT)
   const [mapLabel, setMapLabel] = useState(
     'Toshkent sh., Yunusobod tumani, Amir Temur shoh ko‘chasi 45-uy',
   )
   const [cardLast4, setCardLast4] = useState('5678')
+
+  const applyAddress = useCallback((coords: LatLon, address: YandexAddress) => {
+    setMapCoords(coords)
+    setMapLabel(address.label)
+    if (address.city) setCity(address.city)
+    if (address.street) setStreet(address.street)
+  }, [])
 
   useEffect(() => {
     if (!user) return
@@ -338,39 +355,41 @@ export function CheckoutPage() {
                   setLocating(true)
                   navigator.geolocation.getCurrentPosition(
                     async (pos) => {
-                      const { latitude, longitude } = pos.coords
+                      const coords: LatLon = [pos.coords.latitude, pos.coords.longitude]
                       try {
-                        const res = await fetch(
-                          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`,
-                          { headers: { Accept: 'application/json' } },
-                        )
-                        const data = (await res.json()) as {
-                          display_name?: string
-                          address?: {
-                            city?: string
-                            town?: string
-                            road?: string
-                            house_number?: string
+                        if (getYandexMapsApiKey()) {
+                          const ymaps = await loadYandexMaps()
+                          const address = await reverseGeocode(ymaps, coords)
+                          applyAddress(coords, address)
+                        } else {
+                          const res = await fetch(
+                            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${coords[0]}&lon=${coords[1]}`,
+                            { headers: { Accept: 'application/json' } },
+                          )
+                          const data = (await res.json()) as {
+                            display_name?: string
+                            address?: {
+                              city?: string
+                              town?: string
+                              road?: string
+                              house_number?: string
+                            }
                           }
+                          applyAddress(coords, {
+                            label:
+                              data.display_name ||
+                              `${coords[0].toFixed(5)}, ${coords[1].toFixed(5)}`,
+                            city: data.address?.city || data.address?.town,
+                            street:
+                              [data.address?.road, data.address?.house_number]
+                                .filter(Boolean)
+                                .join(', ') || undefined,
+                          })
                         }
-                        const label =
-                          data.display_name ||
-                          `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`
-                        setMapLabel(label)
-                        setCity(
-                          data.address?.city ||
-                            data.address?.town ||
-                            'Toshkent sh.',
-                        )
-                        setStreet(
-                          [data.address?.road, data.address?.house_number]
-                            .filter(Boolean)
-                            .join(', ') || label,
-                        )
                       } catch {
-                        const label = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`
-                        setMapLabel(label)
-                        setStreet(label)
+                        applyAddress(coords, {
+                          label: `${coords[0].toFixed(5)}, ${coords[1].toFixed(5)}`,
+                        })
                       } finally {
                         setLocating(false)
                       }
@@ -389,41 +408,15 @@ export function CheckoutPage() {
               </button>
             </div>
 
-            <div className="relative aspect-[3/1] min-h-[168px] w-full overflow-hidden rounded-[14px] bg-[#E8EEF4] sm:min-h-[200px]">
-              <iframe
-                title={t('checkout.mapTitle')}
-                src="https://www.openstreetmap.org/export/embed.html?bbox=69.255%2C41.312%2C69.305%2C41.345&amp;layer=mapnik&amp;marker=41.3285%2C69.2805"
-                className="pointer-events-none absolute inset-0 h-[calc(100%+56px)] w-full -translate-y-[28px] border-0"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[48%] bg-gradient-to-t from-black/15 via-black/5 to-transparent" />
-
-              <div className="absolute inset-x-[10px] bottom-[10px] z-10 flex min-w-0 items-center gap-[8px] rounded-[12px] bg-white/95 px-[10px] py-[8px] shadow-[0_4px_16px_rgba(20,27,43,0.08)] sm:inset-x-[12px] sm:bottom-[12px] sm:gap-[10px] sm:px-[12px] sm:py-[10px]">
-                <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full bg-[#F97316] text-white sm:h-[36px] sm:w-[36px]">
-                  <Icon name="near_me" className="text-[16px] sm:text-[18px]" filled />
-                </span>
-                <div className="min-w-0 flex-1 overflow-hidden">
-                  <p className="text-[9px] font-semibold tracking-[0.1em] text-[#F97316] uppercase sm:text-[10px]">
-                    {t('checkout.selectedLocation')}
-                  </p>
-                  <p className="truncate text-[12px] font-medium text-[#141b2b] sm:text-[13px]">
-                    {mapLabel}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const q = encodeURIComponent(`${city}, ${street}`)
-                    window.open(`https://www.openstreetmap.org/search?query=${q}`, '_blank')
-                  }}
-                  className="hidden shrink-0 cursor-pointer rounded-[8px] border border-[#D8DEF5] px-[8px] py-[5px] text-[11px] font-semibold whitespace-nowrap text-[#7B88D4] hover:bg-[#F5F6FF] sm:inline-flex sm:text-[12px]"
-                >
-                  {t('checkout.changeOnMap')}
-                </button>
-              </div>
-            </div>
+            <YandexDeliveryMap
+              coords={mapCoords}
+              label={mapLabel}
+              selectedTitle={t('checkout.selectedLocation')}
+              changeLabel={t('checkout.changeOnMap')}
+              mapTitle={t('checkout.mapTitle')}
+              pickHint={t('checkout.pickOnMap')}
+              onLocationChange={applyAddress}
+            />
 
             <div className="mt-[12px] grid grid-cols-1 gap-[10px] min-[700px]:grid-cols-2">
               <Field
