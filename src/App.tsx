@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AdminShell } from './admin/components/AdminShell'
+import { RequirePanelAuth } from './admin/components/RequirePanelAuth'
 import { SuperAdminShell } from './admin/components/SuperAdminShell'
 import { AdminDashboardPage } from './admin/pages/AdminDashboardPage'
 import {
@@ -44,30 +45,50 @@ export default function App() {
         <Route path="register" element={<RegisterPage />} />
         <Route path="parolni-tiklash" element={<ForgotPasswordPage />} />
 
-        <Route path="admin" element={<AdminShell />}>
-          <Route index element={<AdminDashboardPage />} />
-          <Route path="buyurtmalar" element={<AdminOrdersPage />} />
-          <Route path="profil" element={<AdminProfilePage />} />
-          <Route path="menyu" element={<AdminMenuPage />} />
-          <Route path="toifalar" element={<AdminCategoriesPage />} />
-          <Route path="mahsulotlar" element={<AdminProductsPage />} />
-          <Route path="aksiyalar" element={<AdminPromosPage />} />
-          <Route path="mijozlar" element={<AdminCustomersPage />} />
-          <Route path="sharhlar" element={<AdminReviewsPage />} />
-          <Route path="tolovlar" element={<AdminPaymentsPage />} />
-          <Route path="statistika" element={<AdminStatsPage />} />
-          <Route path="sozlamalar" element={<AdminSettingsPage />} />
+        {/* Admin — kirish umumiy /kirish orqali */}
+        <Route path="admin">
+          <Route path="kirish" element={<Navigate to="/kirish" replace />} />
+          <Route
+            element={
+              <RequirePanelAuth role="admin">
+                <AdminShell />
+              </RequirePanelAuth>
+            }
+          >
+            <Route index element={<AdminDashboardPage />} />
+            <Route path="buyurtmalar" element={<AdminOrdersPage />} />
+            <Route path="profil" element={<AdminProfilePage />} />
+            <Route path="menyu" element={<AdminMenuPage />} />
+            <Route path="toifalar" element={<AdminCategoriesPage />} />
+            <Route path="mahsulotlar" element={<AdminProductsPage />} />
+            <Route path="aksiyalar" element={<AdminPromosPage />} />
+            <Route path="mijozlar" element={<AdminCustomersPage />} />
+            <Route path="sharhlar" element={<AdminReviewsPage />} />
+            <Route path="tolovlar" element={<AdminPaymentsPage />} />
+            <Route path="statistika" element={<AdminStatsPage />} />
+            <Route path="sozlamalar" element={<AdminSettingsPage />} />
+          </Route>
         </Route>
 
-        <Route path="super-admin" element={<SuperAdminShell />}>
-          <Route index element={<SuperAdminDashboardPage />} />
-          <Route path="restoranlar" element={<SuperRestaurantsPage />} />
-          <Route path="adminlar" element={<SuperAdminsPage />} />
-          <Route path="buyurtmalar" element={<SuperOrdersPage />} />
-          <Route path="moliya" element={<SuperFinancePage />} />
-          <Route path="hisobotlar" element={<SuperReportsPage />} />
-          <Route path="loglar" element={<SuperLogsPage />} />
-          <Route path="sozlamalar" element={<SuperSettingsPage />} />
+        {/* Super Admin — kirish umumiy /kirish orqali */}
+        <Route path="super-admin">
+          <Route path="kirish" element={<Navigate to="/kirish" replace />} />
+          <Route
+            element={
+              <RequirePanelAuth role="super-admin">
+                <SuperAdminShell />
+              </RequirePanelAuth>
+            }
+          >
+            <Route index element={<SuperAdminDashboardPage />} />
+            <Route path="restoranlar" element={<SuperRestaurantsPage />} />
+            <Route path="adminlar" element={<SuperAdminsPage />} />
+            <Route path="buyurtmalar" element={<SuperOrdersPage />} />
+            <Route path="moliya" element={<SuperFinancePage />} />
+            <Route path="hisobotlar" element={<SuperReportsPage />} />
+            <Route path="loglar" element={<SuperLogsPage />} />
+            <Route path="sozlamalar" element={<SuperSettingsPage />} />
+          </Route>
         </Route>
 
         <Route element={<MainLayout />}>
@@ -80,6 +101,7 @@ export default function App() {
           <Route path="sevimlilar" element={<FavoritesPage />} />
           <Route path="profil" element={<ProfilePage />} />
         </Route>
+
         <Route path="kategoriyalar" element={<Navigate to="/" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

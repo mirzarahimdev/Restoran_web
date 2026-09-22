@@ -1,7 +1,12 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
+import {
+  isPanelUsername,
+  matchPanelRole,
+  panelHomePath,
+  useAdminAuth,
+} from '../admin/auth/AdminAuthContext'
 import { useAuth } from '../auth/AuthContext'
-import { GoogleIcon } from '../components/ui/GoogleIcon'
 import { Icon } from '../components/ui/Icon'
 import { Logo } from '../components/ui/Logo'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -12,41 +17,40 @@ const AUTH_FOOD_IMG =
 export function LoginPage() {
   const navigate = useNavigate()
   const { t } = useLanguage()
-  const { login, loginWithGoogle } = useAuth()
-  const [mode, setMode] = useState<'phone' | 'email'>('phone')
+  const { login } = useAuth()
+  const { user: panelUser, login: panelLogin } = useAdminAuth()
   const [showPassword, setShowPassword] = useState(false)
-  const [phone, setPhone] = useState('+998901112233')
-  const [email, setEmail] = useState('aziza@fooduz.uz')
-  const [password, setPassword] = useState('password123')
+  const [loginId, setLoginId] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  if (panelUser) {
+    return <Navigate to={panelHomePath(panelUser.role)} replace />
+  }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
+
     try {
-      if (mode === 'email') {
-        await login({ email: email.trim(), password })
-      } else {
-        await login({ phone: phone.trim(), password })
+      const panelRole = matchPanelRole(loginId, password)
+      if (panelRole) {
+        panelLogin(loginId, password, panelRole)
+        navigate(panelHomePath(panelRole), { replace: true })
+        return
       }
+
+      if (isPanelUsername(loginId)) {
+        setError("Login yoki parol noto'g'ri")
+        return
+      }
+
+      await login({ login: loginId.trim(), password })
       navigate('/')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleGoogle = async () => {
-    setError('')
-    setLoading(true)
-    try {
-      await loginWithGoogle()
-      navigate('/')
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Google orqali kirish muvaffaqiyatsiz')
     } finally {
       setLoading(false)
     }
@@ -127,77 +131,26 @@ export function LoginPage() {
                 </div>
               </div>
 
-              <div className="flex w-full items-center rounded-[12px] bg-[#F1F3FF] p-[4px]">
-                <button
-                  type="button"
-                  onClick={() => setMode('phone')}
-                  className={`flex-1 rounded-[10px] py-[10px] text-center text-[13px] font-semibold transition-all ${
-                    mode === 'phone'
-                      ? 'bg-white text-[#9d4300] shadow-sm'
-                      : 'text-[#6B7280] hover:text-[#141b2b]'
-                  }`}
-                >
-                  {t('login.mode.phone')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode('email')}
-                  className={`flex-1 rounded-[10px] py-[10px] text-center text-[13px] font-semibold transition-all ${
-                    mode === 'email'
-                      ? 'bg-white text-[#9d4300] shadow-sm'
-                      : 'text-[#6B7280] hover:text-[#141b2b]'
-                  }`}
-                >
-                  {t('login.mode.email')}
-                </button>
-              </div>
-
               <form className="space-y-4" onSubmit={handleSubmit}>
-                {mode === 'phone' ? (
-                  <div className="space-y-2">
-                    <label className="block text-[13px] font-semibold text-[#141b2b]" htmlFor="phone">
-                      {t('login.phone')}
-                    </label>
-                    <div className="relative flex items-center rounded-[12px] border border-[#E5E7EB] bg-white transition-shadow focus-within:border-[#F97316]/50 focus-within:ring-2 focus-within:ring-[#F97316]/20">
-                      <div className="flex items-center gap-[4px] px-[14px] py-[12px] text-[13px] font-bold text-[#141b2b]">
-                        <span>UZ</span>
-                        <span className="font-semibold text-[#6B7280]">+998</span>
-                      </div>
-                      <div className="h-[22px] w-px bg-[#E5E7EB]" />
-                      <input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        value={phone.replace(/^\+998/, '')}
-                        onChange={(e) => {
-                          const digits = e.target.value.replace(/\D/g, '').slice(0, 9)
-                          setPhone(`+998${digits}`)
-                        }}
-                        placeholder="(90) 123-45-67"
-                        className="w-full bg-transparent px-[14px] py-[12px] text-[14px] text-[#141b2b] placeholder:text-[#9CA3AF] focus:outline-none"
-                      />
-                    </div>
+                <div className="space-y-2">
+                  <label className="block text-[13px] font-semibold text-[#141b2b]" htmlFor="login">
+                    {t('login.login')}
+                  </label>
+                  <div className="relative flex items-center rounded-[12px] border border-[#E5E7EB] bg-white transition-shadow focus-within:border-[#F97316]/50 focus-within:ring-2 focus-within:ring-[#F97316]/20">
+                    <Icon name="person" className="pl-[14px] pr-[6px] text-[20px] text-[#9CA3AF]" />
+                    <input
+                      id="login"
+                      name="login"
+                      type="text"
+                      autoComplete="username"
+                      value={loginId}
+                      onChange={(e) => setLoginId(e.target.value)}
+                      placeholder={t('login.loginPlaceholder')}
+                      className="w-full bg-transparent py-[12px] pr-[14px] text-[14px] text-[#141b2b] placeholder:text-[#9CA3AF] focus:outline-none"
+                      required
+                    />
                   </div>
-                ) : (
-                  <div className="space-y-2">
-                    <label className="block text-[13px] font-semibold text-[#141b2b]" htmlFor="email">
-                      {t('login.email')}
-                    </label>
-                    <div className="relative flex items-center rounded-[12px] border border-[#E5E7EB] bg-white transition-shadow focus-within:border-[#F97316]/50 focus-within:ring-2 focus-within:ring-[#F97316]/20">
-                      <Icon name="mail" className="pl-[14px] pr-[6px] text-[20px] text-[#9CA3AF]" />
-                      <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="misol@fooduz.uz"
-                        className="w-full bg-transparent py-[12px] pr-[14px] text-[14px] text-[#141b2b] placeholder:text-[#9CA3AF] focus:outline-none"
-                        required
-                      />
-                    </div>
-                  </div>
-                )}
+                </div>
 
                 <div className="space-y-2">
                   <label
@@ -216,11 +169,12 @@ export function LoginPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder={t('login.passwordPlaceholder')}
                       className="w-full bg-transparent py-[12px] pr-[8px] text-[14px] text-[#141b2b] placeholder:text-[#9CA3AF] focus:outline-none"
+                      required
                     />
                     <button
                       type="button"
                       aria-label="Parolni ko'rsatish yoki yashirish"
-                      className="mr-[8px] p-[6px] text-[#9CA3AF] transition-colors hover:text-[#141b2b]"
+                      className="mr-[8px] cursor-pointer p-[6px] text-[#9CA3AF] transition-colors hover:text-[#141b2b]"
                       onClick={() => setShowPassword((v) => !v)}
                     >
                       <Icon
@@ -263,23 +217,6 @@ export function LoginPage() {
                   <Icon name="arrow_forward" className="text-[20px]" />
                 </button>
               </form>
-
-              <div className="relative flex items-center justify-center py-1">
-                <div className="h-px w-full bg-[#E5E7EB]" />
-                <span className="absolute bg-white px-[12px] text-[12px] font-semibold tracking-wider text-[#9CA3AF] uppercase">
-                  {t('common.or')}
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => void handleGoogle()}
-                disabled={loading}
-                className="flex w-full items-center justify-center gap-[12px] rounded-[14px] border border-[#E5E7EB] bg-white px-[16px] py-[12px] text-[14px] font-semibold text-[#141b2b] transition-all hover:bg-[#F9F9FF] disabled:opacity-60"
-              >
-                <GoogleIcon />
-                <span>{t('login.google')}</span>
-              </button>
 
               <div className="pt-2 text-center">
                 <p className="text-[14px] text-[#6B7280]">

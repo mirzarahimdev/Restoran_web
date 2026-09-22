@@ -86,19 +86,33 @@ def register(body: RegisterIn, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=TokenOut)
 def login(body: LoginIn, db: Session = Depends(get_db)):
-    if not body.phone and not body.email:
-        raise HTTPException(status_code=400, detail="Telefon yoki email kerak")
+    identifier = (body.login or body.phone or (str(body.email) if body.email else "") or "").strip()
+    if not identifier:
+        raise HTTPException(status_code=400, detail="Login kerak")
 
-    user: User | None = None
-    if body.email:
-        user = _find_by_email(db, str(body.email))
-    else:
-        user = db.query(User).filter(User.phone == (body.phone or "").strip()).first()
+    lowered = identifier.lower()
+    user: User | None = (
+        db.query(User)
+        .filter(User.username.isnot(None), func.lower(User.username) == lowered)
+        .first()
+    )
+
+    if not user and "@" in identifier:
+        user = _find_by_email(db, identifier)
+
+    if not user:
+        phone_candidates = {identifier}
+        digits = "".join(ch for ch in identifier if ch.isdigit())
+        if digits.startswith("998") and len(digits) == 12:
+            phone_candidates.add(f"+{digits}")
+        elif len(digits) == 9:
+            phone_candidates.add(f"+998{digits}")
+        user = db.query(User).filter(User.phone.in_(phone_candidates)).first()
 
     if not user or not verify_password(body.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Telefon/email yoki parol noto'g'ri",
+            detail="Login yoki parol noto'g'ri",
         )
     return _issue_token(user)
 

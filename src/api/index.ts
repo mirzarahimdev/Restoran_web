@@ -91,7 +91,12 @@ export const api = {
       token,
     }),
 
-  login: (payload: { phone?: string; email?: string; password: string }) =>
+  login: (payload: {
+    login?: string
+    phone?: string
+    email?: string
+    password: string
+  }) =>
     apiFetch<TokenDto>('/auth/login', {
       method: 'POST',
       body: payload,

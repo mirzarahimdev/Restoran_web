@@ -781,6 +781,8 @@ def ensure_user_google_id_column() -> None:
         }
         if "google_id" not in cols:
             conn.execute(text("ALTER TABLE users ADD COLUMN google_id VARCHAR(64)"))
+        if "username" not in cols:
+            conn.execute(text("ALTER TABLE users ADD COLUMN username VARCHAR(64)"))
 
 
 def seed(reset: bool = False) -> None:
@@ -864,6 +866,7 @@ def seed(reset: bool = False) -> None:
         if not demo_user:
             demo_user = User(
                 full_name="Aziza Karimova",
+                username="aziza",
                 phone="+998901112233",
                 email="aziza@fooduz.uz",
                 password_hash=hash_password("password123"),
@@ -871,8 +874,11 @@ def seed(reset: bool = False) -> None:
             )
             db.add(demo_user)
             db.flush()
-        elif not demo_user.avatar:
-            demo_user.avatar = demo_avatar
+        else:
+            if not demo_user.avatar:
+                demo_user.avatar = demo_avatar
+            if not getattr(demo_user, "username", None):
+                demo_user.username = "aziza"
             db.add(demo_user)
 
         for rid in ("samarqand-osh", "bella-pizza", "rayhon-milliy"):

@@ -1,17 +1,25 @@
 import { Link } from 'react-router-dom'
+import type { ReactNode } from 'react'
 
 type LogoProps = {
   className?: string
   showText?: boolean
   size?: 'sm' | 'md'
+  /** false bo‘lsa Link o‘rniga span (panel appbar uchun) */
+  linkTo?: string | false
 }
 
-export function Logo({ className = '', showText = true, size = 'md' }: LogoProps) {
+export function Logo({
+  className = '',
+  showText = true,
+  size = 'md',
+  linkTo = '/',
+}: LogoProps) {
   const iconSize = size === 'sm' ? 'h-[32px] w-[32px]' : 'h-[36px] w-[36px]'
   const textSize = size === 'sm' ? 'text-[16px]' : 'text-headline-md'
 
-  return (
-    <Link to="/" className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 ${className}`}>
+  const content: ReactNode = (
+    <>
       <svg
         className={`${iconSize} shrink-0`}
         viewBox="0 0 48 48"
@@ -38,6 +46,21 @@ export function Logo({ className = '', showText = true, size = 'md' }: LogoProps
           )}
         </span>
       )}
+    </>
+  )
+
+  if (linkTo === false) {
+    return (
+      <span className={`inline-flex shrink-0 items-center gap-1.5 ${className}`}>{content}</span>
+    )
+  }
+
+  return (
+    <Link
+      to={linkTo}
+      className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 ${className}`}
+    >
+      {content}
     </Link>
   )
 }

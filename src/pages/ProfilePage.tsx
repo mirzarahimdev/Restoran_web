@@ -126,7 +126,13 @@ function Modal({
 }
 
 function openMaps(query: string) {
-  window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank')
+  const text = query.trim()
+  if (!text) return
+  window.open(
+    `https://yandex.uz/maps/?text=${encodeURIComponent(text)}&z=16&l=map`,
+    '_blank',
+    'noopener,noreferrer',
+  )
 }
 
 function printReceipt(order: OrderDto, restaurantName: string, t: (k: string) => string) {
@@ -158,7 +164,7 @@ function printReceipt(order: OrderDto, restaurantName: string, t: (k: string) =>
 
 export function ProfilePage() {
   const { t, lang } = useLanguage()
-  const { user, token, logout, updateProfile, changePassword } = useAuth()
+  const { user, token, updateProfile, changePassword } = useAuth()
   const { syncRestaurantCart } = useCart()
   const navigate = useNavigate()
   const historyRef = useRef<HTMLElement>(null)
@@ -456,28 +462,6 @@ export function ProfilePage() {
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="flex shrink-0 flex-col items-stretch gap-[10px] sm:items-end">
-            <button
-              type="button"
-              onClick={openEdit}
-              className="inline-flex h-[44px] cursor-pointer items-center justify-center gap-[8px] rounded-full bg-[#F97316] px-[18px] text-[13px] font-bold text-white transition-colors hover:bg-[#EA580C]"
-            >
-              <Icon name="edit" className="text-[18px]" />
-              {t('profile.edit')}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                logout()
-                navigate('/')
-              }}
-              className="inline-flex cursor-pointer items-center justify-center gap-[6px] text-[13px] font-semibold text-[#6B7280] transition-colors hover:text-[#141b2b]"
-            >
-              <Icon name="logout" className="text-[18px]" />
-              {t('profile.logout')}
-            </button>
           </div>
         </div>
       </section>
@@ -779,7 +763,14 @@ export function ProfilePage() {
               <div className="flex flex-col gap-[10px] sm:flex-row">
                 <button
                   type="button"
-                  onClick={() => openMaps(liveOrder.address)}
+                  onClick={() =>
+                    openMaps(
+                      liveOrder.address ||
+                        liveRest?.address ||
+                        liveRest?.name ||
+                        'Toshkent',
+                    )
+                  }
                   className="inline-flex h-[44px] flex-1 cursor-pointer items-center justify-center gap-[8px] rounded-full bg-[#F97316] px-[16px] text-[13px] font-bold text-white hover:bg-[#EA580C]"
                 >
                   <Icon name="map" className="text-[18px]" />

@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
+import { getGoogleClientId } from '../auth/google'
 import { GoogleIcon } from '../components/ui/GoogleIcon'
 import { Icon } from '../components/ui/Icon'
 import { Logo } from '../components/ui/Logo'
@@ -94,6 +95,12 @@ export function RegisterPage() {
 
   const handleGoogle = async () => {
     setError('')
+    if (!getGoogleClientId()) {
+      setError(
+        'Google orqali kirish hozircha sozlanmagan. .env fayliga VITE_GOOGLE_CLIENT_ID qo‘shing.',
+      )
+      return
+    }
     setLoading(true)
     try {
       await loginWithGoogle()

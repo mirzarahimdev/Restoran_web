@@ -107,6 +107,7 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     full_name: Mapped[str] = mapped_column(String(200))
+    username: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True, index=True)
     phone: Mapped[str] = mapped_column(String(32), unique=True, index=True)
     email: Mapped[str | None] = mapped_column(String(200), unique=True, nullable=True)
     password_hash: Mapped[str] = mapped_column(String(255))

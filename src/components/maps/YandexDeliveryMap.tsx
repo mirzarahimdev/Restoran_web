@@ -39,7 +39,7 @@ export function YandexDeliveryMap({
 
   const [pickMode, setPickMode] = useState(false)
   const [ready, setReady] = useState(false)
-  const [failed, setFailed] = useState(false)
+  const [useWidget, setUseWidget] = useState(!getYandexMapsApiKey())
   const hasKey = Boolean(getYandexMapsApiKey())
 
   useEffect(() => {
@@ -55,16 +55,19 @@ export function YandexDeliveryMap({
   }, [pickMode])
 
   useEffect(() => {
-    if (!hasKey) return
+    if (!hasKey || useWidget) return
 
     let cancelled = false
     let clickHandler: ((e: { get: (key: string) => LatLon }) => void) | null = null
+    let resizeObserver: ResizeObserver | null = null
 
     const timer = window.setTimeout(() => {
-      const el = containerRef.current
-      if (!el) return
+      if (!containerRef.current) {
+        setUseWidget(true)
+        return
+      }
 
-      loadYandexMaps()
+      loadYandexMaps('uz_UZ')
         .then((ymaps) => {
           if (cancelled || !containerRef.current) return
 
@@ -73,18 +76,28 @@ export function YandexDeliveryMap({
             containerRef.current,
             {
               center: start,
-              zoom: 15,
-              controls: ['zoomControl'],
+              zoom: 16,
+              controls: [],
+              type: 'yandex#map',
             },
-            { suppressMapOpenBlock: true },
+            {
+              suppressMapOpenBlock: true,
+              yandexMapDisablePoiInteractivity: true,
+            },
           )
+
+          map.controls.add('zoomControl', { position: { left: 12, top: 12 } })
+          map.controls.add('geolocationControl', { position: { left: 12, top: 108 } })
 
           const placemark = new ymaps.Placemark(
             start,
-            {},
+            {
+              hintContent: mapTitle,
+            },
             {
               preset: 'islands#darkGreenCircleDotIcon',
               draggable: true,
+              cursor: 'pointer',
             },
           )
 
@@ -95,7 +108,7 @@ export function YandexDeliveryMap({
 
           const applyCoords = async (next: LatLon) => {
             placemark.geometry.setCoordinates(next)
-            map.setCenter(next)
+            map.setCenter(next, undefined, { duration: 200 })
             try {
               const address = await reverseGeocode(ymaps, next)
               onLocationChangeRef.current(next, address)
@@ -107,31 +120,34 @@ export function YandexDeliveryMap({
           }
 
           clickHandler = (e) => {
+            if (!pickModeRef.current) return
             const next = e.get('coords')
             void applyCoords(next).then(() => {
-              if (!cancelled && pickModeRef.current) setPickMode(false)
+              if (!cancelled) setPickMode(false)
             })
           }
 
           map.events.add('click', clickHandler)
-
           placemark.events.add('dragend', () => {
-            const next = placemark.geometry.getCoordinates()
-            void applyCoords(next)
+            void applyCoords(placemark.geometry.getCoordinates())
           })
 
-          // Ensure size after layout settles (rounded container / aspect ratio).
-          window.setTimeout(() => map.container.fitToViewport(), 50)
+          const fit = () => map.container.fitToViewport()
+          window.setTimeout(fit, 80)
+          window.setTimeout(fit, 300)
+          resizeObserver = new ResizeObserver(fit)
+          resizeObserver.observe(containerRef.current)
         })
         .catch((err) => {
           console.error('Yandex Maps init failed', err)
-          if (!cancelled) setFailed(true)
+          if (!cancelled) setUseWidget(true)
         })
     }, 0)
 
     return () => {
       cancelled = true
       window.clearTimeout(timer)
+      resizeObserver?.disconnect()
       if (mapRef.current && clickHandler) {
         mapRef.current.events.remove('click', clickHandler)
       }
@@ -139,7 +155,7 @@ export function YandexDeliveryMap({
       mapRef.current = null
       placemarkRef.current = null
     }
-  }, [hasKey])
+  }, [hasKey, useWidget, mapTitle])
 
   useEffect(() => {
     if (!mapRef.current || !placemarkRef.current) return
@@ -154,14 +170,12 @@ export function YandexDeliveryMap({
     mapRef.current.setCenter(coords)
   }, [coords])
 
-  const showWidget = !hasKey || failed
-
   return (
-    <div className="relative aspect-[3/1] min-h-[168px] w-full overflow-hidden rounded-[14px] bg-[#E8EEF4] sm:min-h-[200px]">
-      {showWidget ? (
+    <div className="relative aspect-[16/9] min-h-[240px] w-full overflow-hidden rounded-[14px] bg-[#E8EEF4] sm:min-h-[280px]">
+      {useWidget ? (
         <iframe
           title={mapTitle}
-          src={yandexWidgetSrc(coords)}
+          src={yandexWidgetSrc(coords, 16)}
           className="absolute inset-0 h-full w-full border-0"
           loading="lazy"
           allow="geolocation"
@@ -171,24 +185,24 @@ export function YandexDeliveryMap({
         <>
           <div
             ref={containerRef}
-            className="absolute inset-0 h-full w-full"
+            className="absolute inset-0 h-full w-full [&_.ymaps-2-1-79-map]:!rounded-none"
             aria-label={mapTitle}
           />
           {!ready && (
             <div className="absolute inset-0 flex items-center justify-center bg-[#E8EEF4] text-[13px] font-medium text-[#6B7280]">
-              …
+              Yandex Maps yuklanmoqda…
             </div>
           )}
         </>
       )}
 
-      {pickMode && !showWidget && (
-        <div className="absolute top-[10px] left-[10px] z-10 rounded-full bg-[#F97316] px-[10px] py-[5px] text-[11px] font-semibold text-white shadow-sm">
+      {pickMode && !useWidget && (
+        <div className="absolute top-[10px] right-[10px] z-10 rounded-full bg-[#F97316] px-[10px] py-[5px] text-[11px] font-semibold text-white shadow-sm">
           {pickHint}
         </div>
       )}
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[48%] bg-gradient-to-t from-black/15 via-black/5 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-black/20 via-black/5 to-transparent" />
 
       <div className="absolute inset-x-[10px] bottom-[10px] z-10 flex min-w-0 items-center gap-[8px] rounded-[12px] bg-white/95 px-[10px] py-[8px] shadow-[0_4px_16px_rgba(20,27,43,0.08)] sm:inset-x-[12px] sm:bottom-[12px] sm:gap-[10px] sm:px-[12px] sm:py-[10px]">
         <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full bg-[#F97316] text-white sm:h-[36px] sm:w-[36px]">
@@ -205,9 +219,9 @@ export function YandexDeliveryMap({
         <button
           type="button"
           onClick={() => {
-            if (showWidget) {
+            if (useWidget) {
               window.open(
-                `https://yandex.uz/maps/?ll=${coords[1]}%2C${coords[0]}&z=16&pt=${coords[1]},${coords[0]}`,
+                `https://yandex.uz/maps/?ll=${coords[1]}%2C${coords[0]}&z=16&pt=${coords[1]},${coords[0]},pm2dgl&l=map`,
                 '_blank',
                 'noopener,noreferrer',
               )

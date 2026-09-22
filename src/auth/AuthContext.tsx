@@ -17,7 +17,12 @@ const USER_KEY = 'fooduz_user'
 type AuthContextValue = {
   user: UserDto | null
   token: string | null
-  login: (payload: { phone?: string; email?: string; password: string }) => Promise<void>
+  login: (payload: {
+    login?: string
+    phone?: string
+    email?: string
+    password: string
+  }) => Promise<void>
   register: (payload: {
     fullName: string
     phone: string
@@ -79,7 +84,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [token, persistUser])
 
   const login = useCallback(
-    async (payload: { phone?: string; email?: string; password: string }) => {
+    async (payload: {
+      login?: string
+      phone?: string
+      email?: string
+      password: string
+    }) => {
       const res = await api.login(payload)
       persist(res.accessToken, res.user)
     },

@@ -56,7 +56,12 @@ export type YMapsApi = {
   ready: (cb: () => void) => void
   Map: new (
     element: HTMLElement | string,
-    state: { center: LatLon; zoom: number; controls?: string[] },
+    state: {
+      center: LatLon
+      zoom: number
+      controls?: string[]
+      type?: string
+    },
     options?: object,
   ) => YMapsMap
   Placemark: new (
@@ -153,7 +158,7 @@ export async function reverseGeocode(
   return parseGeoObject(obj)
 }
 
-export function yandexWidgetSrc(coords: LatLon, zoom = 15) {
+export function yandexWidgetSrc(coords: LatLon, zoom = 16) {
   const [lat, lon] = coords
-  return `https://yandex.uz/map-widget/v1/?ll=${lon}%2C${lat}&z=${zoom}&pt=${lon},${lat},pm2dgl&lang=uz_UZ`
+  return `https://yandex.uz/map-widget/v1/?ll=${lon}%2C${lat}&z=${zoom}&l=map&pt=${lon},${lat},pm2dgl&lang=uz_UZ`
 }

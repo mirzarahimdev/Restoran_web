@@ -169,8 +169,8 @@ export function AdminDashboardPage() {
     <div className="flex w-full flex-col">
       <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 text-[11px] text-[#584237]">
-            <span className="cursor-pointer transition-colors hover:text-[#F97316]">
+          <div className="flex flex-wrap items-center gap-2 text-[11px] text-[#584237]">
+            <span className="cursor-pointer transition-colors hover:text-[#9D4300]">
               Boshqaruv paneli
             </span>
             <Icon name="chevron_right" className="text-[14px]" />
@@ -180,7 +180,7 @@ export function AdminDashboardPage() {
             </span>
           </div>
           <div className="mt-0.5 flex flex-wrap items-center gap-3">
-            <h1 className="text-[22px] font-bold tracking-tight text-[#141b2b]">
+            <h1 className="text-[22px] leading-7 font-bold tracking-tight text-[#141b2b]">
               Oshxona boshqaruv markazi
             </h1>
             <div className="flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-bold text-emerald-600">
@@ -193,23 +193,23 @@ export function AdminDashboardPage() {
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
-            className="flex cursor-pointer items-center gap-2 rounded-full bg-white px-4 py-2 text-[13px] font-semibold shadow-sm hover:bg-[#E9EDFF]"
+            className="flex h-11 cursor-pointer items-center gap-2.5 rounded-full bg-white px-5 text-[14px] font-semibold text-[#141b2b] shadow-sm transition-colors hover:bg-[#E9EDFF]"
           >
-            <Icon name="tune" className="text-[20px] text-[#584237]" />
+            <Icon name="tune" className="text-[22px] text-[#584237]" />
             Filtrlar
           </button>
           <button
             type="button"
-            className="flex cursor-pointer items-center gap-2 rounded-full bg-white px-4 py-2 text-[13px] font-semibold shadow-sm hover:bg-[#E9EDFF]"
+            className="flex h-11 cursor-pointer items-center gap-2.5 rounded-full bg-white px-5 text-[14px] font-semibold text-[#141b2b] shadow-sm transition-colors hover:bg-[#E9EDFF]"
           >
-            <Icon name="download" className="text-[20px] text-[#584237]" />
+            <Icon name="download" className="text-[22px] text-[#584237]" />
             Eksport (Excel)
           </button>
           <button
             type="button"
-            className="flex cursor-pointer items-center gap-2 rounded-full bg-[#F97316] px-5 py-2 text-[13px] font-bold text-white shadow-[0_4px_14px_rgba(249,115,22,0.3)] transition-transform hover:bg-[#A73A00] active:scale-95"
+            className="flex h-11 cursor-pointer items-center gap-2.5 rounded-full bg-[#F97316] px-6 text-[14px] font-bold text-white shadow-[0_4px_14px_rgba(249,115,22,0.3)] transition-transform hover:bg-[#A73A00] active:scale-95"
           >
-            <Icon name="point_of_sale" className="text-[20px]" />
+            <Icon name="point_of_sale" className="text-[22px]" />
             Kassa (Yangi chek)
           </button>
         </div>
@@ -304,7 +304,7 @@ export function AdminDashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
-        <div className="flex flex-col gap-6 xl:col-span-8">
+        <div className="flex min-w-0 flex-col gap-6 xl:col-span-8">
           <section className="rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(17,24,39,0.04)]">
             <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
               <div>
@@ -392,8 +392,8 @@ export function AdminDashboardPage() {
             </div>
           </section>
 
-          <section className="flex flex-col rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(17,24,39,0.04)]">
-            <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          <section className="flex w-full min-w-0 flex-col overflow-hidden rounded-2xl bg-white p-5 shadow-[0_2px_12px_rgba(17,24,39,0.04)]">
+            <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
               <div>
                 <h2 className="text-[18px] font-bold text-[#141b2b]">So‘nggi buyurtmalar</h2>
                 <p className="mt-0.5 text-[12px] text-[#584237]">
@@ -401,21 +401,21 @@ export function AdminDashboardPage() {
                 </p>
               </div>
               <div className="relative flex items-center">
-                <Icon name="search" className="absolute left-2 text-[18px] text-[#584237]" />
+                <Icon name="search" className="absolute left-2.5 text-[18px] text-[#584237]" />
                 <input
-                  className="w-48 rounded-full bg-[#F1F3FF] py-1.5 pr-3 pl-8 text-[12px] outline-none"
+                  className="h-9 w-48 rounded-full bg-[#F1F3FF] pr-3 pl-9 text-[12px] outline-none"
                   placeholder="Buyurtma ID yoki ism..."
                 />
               </div>
             </div>
 
-            <div className="mb-4 flex items-center gap-2 overflow-x-auto pb-2">
+            <div className="mb-3 flex items-center gap-1.5 overflow-x-auto pb-1.5">
               {orderTabs.map((t) => (
                 <button
                   key={t.id}
                   type="button"
                   onClick={() => setTab(t.id)}
-                  className={`cursor-pointer rounded-full px-4 py-2 text-[13px] whitespace-nowrap transition-colors ${
+                  className={`cursor-pointer rounded-full px-3 py-1.5 text-[12px] whitespace-nowrap transition-colors ${
                     tab === t.id
                       ? 'bg-[#141b2b] font-bold text-white shadow-sm'
                       : 'bg-[#F1F3FF] font-medium text-[#141b2b] hover:bg-[#E9EDFF]'
@@ -424,7 +424,7 @@ export function AdminDashboardPage() {
                   {t.label}{' '}
                   {t.badge ? (
                     <span
-                      className={`ml-1 rounded-full px-1.5 text-[11px] font-bold ${
+                      className={`ml-0.5 rounded-full px-1.5 py-px text-[10px] font-bold ${
                         t.badgeTone === 'hot'
                           ? 'bg-[#FF6D2C] text-white'
                           : t.badgeTone === 'amber'
@@ -436,7 +436,7 @@ export function AdminDashboardPage() {
                     </span>
                   ) : (
                     <span
-                      className={`ml-1 text-[11px] font-bold ${
+                      className={`ml-0.5 text-[10px] font-bold ${
                         t.countTone === 'error' ? 'text-[#BA1A1A]' : 'opacity-70'
                       }`}
                     >
@@ -447,17 +447,17 @@ export function AdminDashboardPage() {
               ))}
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
+            <div className="w-full min-w-0 overflow-x-auto">
+              <table className="w-full min-w-[920px] text-left">
                 <thead>
-                  <tr className="bg-[#F1F3FF]/60 text-[11px] tracking-wider text-[#584237] uppercase">
-                    <th className="rounded-l-xl px-4 py-3">ID</th>
-                    <th className="px-4 py-3">Mijoz</th>
-                    <th className="px-4 py-3">Taomlar to‘plami</th>
-                    <th className="px-4 py-3">Jami narx</th>
-                    <th className="px-4 py-3">To‘lov holati</th>
-                    <th className="px-4 py-3">Buyurtma holati</th>
-                    <th className="rounded-r-xl px-4 py-3 text-right">Amallar</th>
+                  <tr className="bg-[#F1F3FF]/60 text-[10px] tracking-wider text-[#584237] uppercase">
+                    <th className="rounded-l-lg px-3 py-2.5">ID</th>
+                    <th className="px-3 py-2.5">Mijoz</th>
+                    <th className="px-3 py-2.5">Taomlar to‘plami</th>
+                    <th className="px-3 py-2.5">Jami narx</th>
+                    <th className="px-3 py-2.5">To‘lov holati</th>
+                    <th className="px-3 py-2.5">Buyurtma holati</th>
+                    <th className="rounded-r-lg px-3 py-2.5 text-right whitespace-nowrap">Amallar</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -468,10 +468,10 @@ export function AdminDashboardPage() {
                         o.highlight ? 'bg-orange-50/30' : ''
                       } ${o.faded ? 'opacity-80' : ''}`}
                     >
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-2">
+                      <td className="px-3 py-3">
+                        <div className="flex items-center gap-1.5">
                           <span
-                            className={`h-2 w-2 rounded-full ${
+                            className={`h-2 w-2 shrink-0 rounded-full ${
                               o.dot === 'ping'
                                 ? 'animate-ping bg-[#FF6D2C]'
                                 : o.dot === 'blue'
@@ -484,38 +484,38 @@ export function AdminDashboardPage() {
                           <span className="text-[13px] font-extrabold">{o.id}</span>
                         </div>
                         <span
-                          className={`text-[12px] ${
+                          className={`text-[11px] ${
                             o.timeHot ? 'font-bold text-[#F97316]' : 'text-[#584237]/70'
                           }`}
                         >
                           {o.time}
                         </span>
                       </td>
-                      <td className="px-4 py-4">
-                        <div className="flex flex-col">
-                          <span className="text-[13px] font-bold">{o.customer}</span>
-                          <span className="text-[12px] text-[#584237]">{o.phone}</span>
+                      <td className="px-3 py-3">
+                        <div className="flex min-w-0 flex-col">
+                          <span className="truncate text-[13px] font-bold">{o.customer}</span>
+                          <span className="truncate text-[11px] text-[#584237]">{o.phone}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-4">
-                        <div className="flex max-w-[200px] flex-col">
+                      <td className="px-3 py-3">
+                        <div className="flex max-w-[160px] min-w-0 flex-col">
                           <span className="truncate text-[13px] font-semibold">{o.items}</span>
-                          <span className="truncate text-[12px] text-[#584237]">{o.extras}</span>
+                          <span className="truncate text-[11px] text-[#584237]">{o.extras}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-4">
-                        <span className="text-[13px] font-extrabold">{o.total}</span>
+                      <td className="px-3 py-3">
+                        <span className="whitespace-nowrap text-[13px] font-extrabold">{o.total}</span>
                         <span
-                          className={`block text-[11px] font-semibold ${
+                          className={`block truncate text-[11px] font-semibold ${
                             o.noteTone === 'emerald' ? 'text-emerald-600' : 'text-[#584237]'
                           }`}
                         >
                           {o.note}
                         </span>
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-3 py-3">
                         <span
-                          className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap ${
                             o.payTone === 'amber'
                               ? 'bg-amber-50 text-amber-700'
                               : 'bg-emerald-50 text-emerald-700'
@@ -525,22 +525,22 @@ export function AdminDashboardPage() {
                           {o.pay}
                         </span>
                       </td>
-                      <td className="px-4 py-4">
-                        <StatusPill tone={o.statusTone} label={o.status} />
+                      <td className="px-3 py-3">
+                        <StatusPill tone={o.statusTone} label={o.status} compact />
                       </td>
-                      <td className="px-4 py-4 text-right">
+                      <td className="px-3 py-3 text-right whitespace-nowrap">
                         {o.accept ? (
                           <button
                             type="button"
-                            className="cursor-pointer rounded-lg bg-[#F97316] px-3 py-1 text-[11px] font-bold text-white shadow hover:bg-[#A73A00]"
+                            className="inline-flex h-8 cursor-pointer items-center justify-center rounded-lg bg-[#F97316] px-3 text-[11px] font-bold whitespace-nowrap text-white shadow-sm hover:bg-[#A73A00]"
                           >
                             Qabul qilish
                           </button>
                         ) : (
-                          <div className="flex items-center justify-end gap-1">
-                            <IconBtn name="visibility" />
-                            <IconBtn name="print" />
-                            {!o.faded && <IconBtn name="edit_note" accent />}
+                          <div className="inline-flex items-center justify-end gap-0.5">
+                            <IconBtn name="visibility" compact />
+                            <IconBtn name="print" compact />
+                            {!o.faded && <IconBtn name="edit_note" accent compact />}
                           </div>
                         )}
                       </td>
@@ -550,7 +550,7 @@ export function AdminDashboardPage() {
               </table>
             </div>
 
-            <div className="-mx-6 -mb-6 mt-4 flex items-center justify-between rounded-b-2xl bg-[#F1F3FF]/30 px-6 pt-4 pb-4">
+            <div className="-mx-5 -mb-5 mt-4 flex items-center justify-between rounded-b-2xl bg-[#F1F3FF]/30 px-5 pt-3 pb-3">
               <span className="text-[12px] text-[#584237]">Jami 142 tadan 1-4 ko‘rsatilmoqda</span>
               <div className="flex items-center gap-1">
                 <PageBtn disabled>
@@ -800,7 +800,15 @@ function PayStat({ color, label, value }: { color: string; label: string; value:
   )
 }
 
-function StatusPill({ tone, label }: { tone: string; label: string }) {
+function StatusPill({
+  tone,
+  label,
+  compact,
+}: {
+  tone: string
+  label: string
+  compact?: boolean
+}) {
   const styles: Record<string, string> = {
     cooking: 'bg-[#FF6D2C]/10 text-[#A73A00]',
     delivery: 'bg-blue-50 text-blue-700',
@@ -809,26 +817,42 @@ function StatusPill({ tone, label }: { tone: string; label: string }) {
   }
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold ${styles[tone] || ''}`}
+      className={`inline-flex max-w-full items-center gap-1 rounded-full font-bold whitespace-nowrap ${
+        compact ? 'px-2.5 py-1 text-[11px]' : 'gap-1.5 px-3.5 py-1.5 text-[12px]'
+      } ${styles[tone] || ''}`}
     >
-      {tone === 'cooking' && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#A73A00]" />}
-      {tone === 'delivery' && <Icon name="sports_motorsports" className="text-[14px]" />}
-      {tone === 'new' && <Icon name="notifications_active" className="text-[14px]" />}
-      {tone === 'done' && <Icon name="task_alt" className="text-[14px]" />}
+      {tone === 'cooking' && (
+        <span className={`animate-pulse rounded-full bg-[#A73A00] ${compact ? 'h-1.5 w-1.5' : 'h-2 w-2'}`} />
+      )}
+      {tone === 'delivery' && (
+        <Icon name="sports_motorsports" className={compact ? 'text-[14px]' : 'text-[16px]'} />
+      )}
+      {tone === 'new' && (
+        <Icon name="notifications_active" className={compact ? 'text-[14px]' : 'text-[16px]'} />
+      )}
+      {tone === 'done' && <Icon name="task_alt" className={compact ? 'text-[14px]' : 'text-[16px]'} />}
       {label}
     </span>
   )
 }
 
-function IconBtn({ name, accent }: { name: string; accent?: boolean }) {
+function IconBtn({
+  name,
+  accent,
+  compact,
+}: {
+  name: string
+  accent?: boolean
+  compact?: boolean
+}) {
   return (
     <button
       type="button"
-      className={`cursor-pointer rounded-lg p-1.5 transition-colors hover:bg-[#E9EDFF] ${
-        accent ? 'text-[#F97316]' : 'text-[#584237] hover:text-[#141b2b]'
-      }`}
+      className={`cursor-pointer rounded-lg transition-colors hover:bg-[#E9EDFF] ${
+        compact ? 'p-1' : 'p-2'
+      } ${accent ? 'text-[#F97316]' : 'text-[#584237] hover:text-[#141b2b]'}`}
     >
-      <Icon name={name} className="text-[20px]" />
+      <Icon name={name} className={compact ? 'text-[18px]' : 'text-[22px]'} />
     </button>
   )
 }
@@ -846,7 +870,7 @@ function PageBtn({
     <button
       type="button"
       disabled={disabled}
-      className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-[11px] transition-colors disabled:opacity-40 ${
+      className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-[12px] transition-colors disabled:opacity-40 ${
         active
           ? 'bg-[#F97316] font-bold text-white shadow-sm'
           : 'bg-white font-semibold text-[#141b2b] hover:bg-[#E9EDFF]'
